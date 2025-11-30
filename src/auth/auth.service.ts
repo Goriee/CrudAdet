@@ -59,30 +59,39 @@ export class AuthService {
   }
 
   async signup(username: string, password: string, email?: string) {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(username, password);
-    
-    // Support optional email column
-    if (email) {
-      await this.db
-        .getPool()
-        .execute(
-          `INSERT INTO ${this.usersTable} (username, password, email) VALUES(?, ?, ?)`,
-          [username, hashedPassword, email],
-        );
-    } else {
-      await this.db
-        .getPool()
-        .execute(
-          `INSERT INTO ${this.usersTable} (username, password) VALUES(?, ?)`,
-          [username, hashedPassword],
-        );
-    }
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      console.log(username, password);
+      
+      // Support optional email column
+      if (email) {
+        await this.db
+          .getPool()
+          .execute(
+            `INSERT INTO ${this.usersTable} (username, password, email) VALUES(?, ?, ?)`,
+            [username, hashedPassword, email],
+          );
+      } else {
+        await this.db
+          .getPool()
+          .execute(
+            `INSERT INTO ${this.usersTable} (username, password) VALUES(?, ?)`,
+            [username, hashedPassword],
+          );
+      }
 
-    return {
-      message: 'Succesfuly created',
-      data: { username, email, hashedPassword },
-    };
+      return {
+        message: 'Successfully created',
+        data: { username, email },
+      };
+    } catch (error: any) {
+      // Handle duplicate username error
+      if (error.code === 'ER_DUP_ENTRY' || error.errno === 1062) {
+        throw new BadRequestException('Username already exists. Please choose a different username.');
+      }
+      // Re-throw other errors
+      throw error;
+    }
   }
 
   async getAll() {
