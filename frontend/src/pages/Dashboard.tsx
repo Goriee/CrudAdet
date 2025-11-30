@@ -208,7 +208,7 @@ const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {positions.map((position, index) => (
+                  {positions.map((position) => (
                     <tr key={position.position_id} className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-150">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
                         <div className="flex items-center">
