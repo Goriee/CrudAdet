@@ -9,7 +9,6 @@ import {
   UploadedFile,
   Body,
   Request,
-  StreamableFile,
   Res,
   ParseIntPipe,
   Query,
@@ -18,9 +17,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesService } from './files.service';
 import { AuthGuard } from '../guards/guard';
 import type { Response } from 'express';
-import { createReadStream, existsSync } from 'fs';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { memoryStorage } from 'multer';
+import { pipeline } from 'stream/promises';
 
 @Controller('files')
 @UseGuards(AuthGuard)
@@ -48,16 +46,7 @@ export class FilesController {
   @Post('upload')
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          const randomName = Array(32)
-            .fill(null)
-            .map(() => Math.round(Math.random() * 16).toString(16))
-            .join('');
-          cb(null, `${randomName}${extname(file.originalname)}`);
-        },
-      }),
+      storage: memoryStorage(),
       limits: {
         fileSize: 10 * 1024 * 1024, // 10MB per file
       },
@@ -92,20 +81,16 @@ export class FilesController {
   async downloadFile(
     @Param('id', ParseIntPipe) id: number,
     @Request() req,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
   ) {
     const file = await this.filesService.getFile(id, req.user.id);
-
-    if (!existsSync(file.path)) {
-      throw new Error('File not found on disk');
-    }
 
     res.set({
       'Content-Type': file.mime_type,
       'Content-Disposition': `attachment; filename="${file.original_name}"`,
     });
 
-    const fileStream = createReadStream(file.path);
-    return new StreamableFile(fileStream);
+    const remoteStream = await this.filesService.getRemoteStream(file.path);
+    await pipeline(remoteStream, res);
   }
 }

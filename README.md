@@ -39,6 +39,20 @@ A robust RESTful API built with NestJS, featuring JWT authentication, MySQL data
 
 - Git</p>
 
+## ☁️ Persistent file storage (Cloudinary)
+
+Local disk uploads on Render disappear after every deploy or restart. To keep user files intact we now stream uploads to Cloudinary. Add the following secrets to your backend `.env` (Render → Environment tab):
+
+```
+CLOUDINARY_CLOUD_NAME=<your-cloud-name>
+CLOUDINARY_API_KEY=<your-api-key>
+CLOUDINARY_API_SECRET=<your-api-secret>
+# Optional: customize the folder that stores all uploads
+CLOUDINARY_FOLDER=crud-adet-storage
+```
+
+> **Heads up:** the `/files/download/:id` endpoint now proxies files from Cloudinary, so previews and downloads continue working even after the server restarts.
+
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
 
 ## 🛠️ Installation  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->

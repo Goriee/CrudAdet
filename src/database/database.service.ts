@@ -34,10 +34,9 @@ export class DatabaseService implements OnModuleInit {
           ssl = { ca };
           console.log(`Using SSL certificate from file: ${sslCaPath}`);
         } else {
-          // If CA is not provided, try default trusted CAs
-          // Some providers use public CAs trusted by Node; if not, they will require a CA file.
-          ssl = { rejectUnauthorized: true };
-          console.log('Using default trusted CAs for SSL connection');
+          // If CA is not provided, allow self-signed certificates (common for cloud DBs like Aiven)
+          ssl = { rejectUnauthorized: false };
+          console.log('Using SSL with self-signed certificate acceptance');
         }
       } catch (e) {
         // Fall back to no SSL only if not strictly required

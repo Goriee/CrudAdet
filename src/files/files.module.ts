@@ -4,6 +4,7 @@ import { FilesController } from './files.controller';
 import { FilesService } from './files.service';
 import { DatabaseModule } from '../database/database.module';
 import { AuthGuard } from '../guards/guard';
+import { CloudinaryService } from './cloudinary.service';
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { AuthGuard } from '../guards/guard';
     JwtModule,
   ],
   controllers: [FilesController],
-  providers: [FilesService, AuthGuard],
+  providers: [FilesService, AuthGuard, CloudinaryService],
   exports: [FilesService],
 })
 export class FilesModule {}
