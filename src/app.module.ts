@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
-import { PositionsModule } from './positions/positions.module';
+import { FilesModule } from './files/files.module';
 import { DatabaseModule } from './database/database.module';
 import jwt from './config/jwt';
 import { JwtModule } from '@nestjs/jwt';
@@ -25,7 +25,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
 
     AuthModule,
-    PositionsModule,
+    FilesModule,
     DatabaseModule,
   ],
 })

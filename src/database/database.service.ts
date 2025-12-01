@@ -82,4 +82,8 @@ export class DatabaseService implements OnModuleInit {
   getPool() {
     return this.pool;
   }
+
+  async query(sql: string, params?: any[]) {
+    return this.pool.query(sql, params);
+  }
 }
