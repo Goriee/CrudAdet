@@ -3,6 +3,7 @@ import { DatabaseService } from '../database/database.service';
 import { createWriteStream, existsSync, mkdirSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 @Injectable()
 export class FilesService {
@@ -21,7 +22,7 @@ export class FilesService {
       : 'SELECT * FROM files WHERE user_id = ? AND folder_id IS NULL AND deleted_at IS NULL ORDER BY created_at DESC';
     
     const params = folderId ? [userId, folderId] : [userId];
-    const [files] = await this.db.query(query, params);
+    const [files] = await this.db.query<RowDataPacket[]>(query, params);
     return files;
   }
 
@@ -31,13 +32,13 @@ export class FilesService {
       : 'SELECT * FROM folders WHERE user_id = ? AND parent_id IS NULL AND deleted_at IS NULL ORDER BY name ASC';
     
     const params = parentId ? [userId, parentId] : [userId];
-    const [folders] = await this.db.query(query, params);
+    const [folders] = await this.db.query<RowDataPacket[]>(query, params);
     return folders;
   }
 
   async uploadFile(userId: number, file: Express.Multer.File, folderId?: number) {
     // Check user storage quota (100MB limit)
-    const [userStats] = await this.db.query(
+    const [userStats] = await this.db.query<RowDataPacket[]>(
       'SELECT COALESCE(SUM(size), 0) as total_size FROM files WHERE user_id = ? AND deleted_at IS NULL',
       [userId]
     );
@@ -56,7 +57,7 @@ export class FilesService {
     const filePath = join(this.uploadPath, storedFilename);
 
     // Save file metadata to database
-    const [result] = await this.db.query(
+    const [result] = await this.db.query<ResultSetHeader>(
       'INSERT INTO files (user_id, folder_id, original_name, stored_name, mime_type, size, path) VALUES (?, ?, ?, ?, ?, ?, ?)',
       [userId, folderId || null, file.originalname, storedFilename, file.mimetype, file.size, filePath]
     );
@@ -72,7 +73,7 @@ export class FilesService {
 
   async createFolder(userId: number, name: string, parentId?: number) {
     // Check if folder with same name exists
-    const [existing] = await this.db.query(
+    const [existing] = await this.db.query<RowDataPacket[]>(
       'SELECT id FROM folders WHERE user_id = ? AND name = ? AND parent_id <=> ? AND deleted_at IS NULL',
       [userId, name, parentId || null]
     );
@@ -81,7 +82,7 @@ export class FilesService {
       throw new BadRequestException('Folder with this name already exists');
     }
 
-    const [result] = await this.db.query(
+    const [result] = await this.db.query<ResultSetHeader>(
       'INSERT INTO folders (user_id, parent_id, name) VALUES (?, ?, ?)',
       [userId, parentId || null, name]
     );
@@ -95,7 +96,7 @@ export class FilesService {
   }
 
   async deleteFile(fileId: number, userId: number) {
-    const [files] = await this.db.query(
+    const [files] = await this.db.query<RowDataPacket[]>(
       'SELECT * FROM files WHERE id = ? AND user_id = ? AND deleted_at IS NULL',
       [fileId, userId]
     );
@@ -122,7 +123,7 @@ export class FilesService {
   }
 
   async deleteFolder(folderId: number, userId: number) {
-    const [folders] = await this.db.query(
+    const [folders] = await this.db.query<RowDataPacket[]>(
       'SELECT * FROM folders WHERE id = ? AND user_id = ? AND deleted_at IS NULL',
       [folderId, userId]
     );
@@ -138,7 +139,7 @@ export class FilesService {
   }
 
   async getFile(fileId: number, userId: number) {
-    const [files] = await this.db.query(
+    const [files] = await this.db.query<RowDataPacket[]>(
       'SELECT * FROM files WHERE id = ? AND user_id = ? AND deleted_at IS NULL',
       [fileId, userId]
     );
@@ -151,7 +152,7 @@ export class FilesService {
   }
 
   async getUserStorageStats(userId: number) {
-    const [stats] = await this.db.query(
+    const [stats] = await this.db.query<RowDataPacket[]>(
       'SELECT COUNT(*) as file_count, COALESCE(SUM(size), 0) as total_size FROM files WHERE user_id = ? AND deleted_at IS NULL',
       [userId]
     );

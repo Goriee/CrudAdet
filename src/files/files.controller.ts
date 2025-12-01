@@ -17,7 +17,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesService } from './files.service';
 import { AuthGuard } from '../guards/guard';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { createReadStream, existsSync } from 'fs';
 import { diskStorage } from 'multer';
 import { extname } from 'path';

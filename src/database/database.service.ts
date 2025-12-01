@@ -83,7 +83,7 @@ export class DatabaseService implements OnModuleInit {
     return this.pool;
   }
 
-  async query(sql: string, params?: any[]) {
-    return this.pool.query(sql, params);
+  async query<T = any>(sql: string, params?: any[]): Promise<[T, any]> {
+    return this.pool.query(sql, params) as Promise<[T, any]>;
   }
 }
