@@ -21,13 +21,15 @@ export class CloudinaryService {
       throw new Error('Missing Cloudinary credentials. Please set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET');
     }
 
+    this.logger.log(`Cloudinary config - Cloud: ${cloudName}, Key: ${apiKey}, Secret length: ${apiSecret?.length || 0}`);
+
     cloudinary.config({
       cloud_name: cloudName,
       api_key: apiKey,
       api_secret: apiSecret,
     });
 
-    this.logger.log(`Cloudinary configured for cloud: ${cloudName}`);
+    this.logger.log(`Cloudinary configured successfully`);
   }
 
   async uploadFile(file: Express.Multer.File): Promise<CloudinaryUploadResult> {
