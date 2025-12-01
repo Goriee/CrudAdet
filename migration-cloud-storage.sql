@@ -1,6 +1,10 @@
 -- Cloud Storage Migration
 -- This script creates the necessary tables for file storage functionality
 
+-- Select the database (usually 'defaultdb' for Render/Aiven MySQL)
+-- If you're using a different database name, change it here
+USE defaultdb;
+
 -- Create folders table
 CREATE TABLE IF NOT EXISTS folders (
   id INT PRIMARY KEY AUTO_INCREMENT,
