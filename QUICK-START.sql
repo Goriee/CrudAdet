@@ -1,11 +1,9 @@
--- Cloud Storage Migration
--- This script creates the necessary tables for file storage functionality
+-- QUICK START MIGRATION - Run this in MySQL Workbench
+-- Double-click your database in the left sidebar FIRST, then run this!
 
--- Select the database (usually 'defaultdb' for Render/Aiven MySQL)
--- If you're using a different database name, change it here
 USE defaultdb;
 
--- Create folders table
+-- Step 1: Create folders table
 CREATE TABLE IF NOT EXISTS folders (
   id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
@@ -20,7 +18,7 @@ CREATE TABLE IF NOT EXISTS folders (
   INDEX idx_deleted (deleted_at)
 );
 
--- Create files table
+-- Step 2: Create files table
 CREATE TABLE IF NOT EXISTS files (
   id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
@@ -39,9 +37,8 @@ CREATE TABLE IF NOT EXISTS files (
   INDEX idx_deleted (deleted_at)
 );
 
--- Drop old positions table (optional - only if you want to remove it completely)
--- DROP TABLE IF EXISTS positions;
+-- Step 3: Verify it worked
+SHOW TABLES;
 
--- Add storage quota column to users table (optional)
--- Note: If column already exists, this will give an error - that's OK, just ignore it
-ALTER TABLE users ADD COLUMN storage_quota BIGINT DEFAULT 104857600 COMMENT '100MB in bytes';
+-- ✅ Done! You should see 'folders' and 'files' in the output.
+-- The storage_quota column is optional - skip it for now if it causes errors.

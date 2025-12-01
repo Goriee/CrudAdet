@@ -50,6 +50,7 @@ CREATE TABLE files (
 -- ========================================
 -- STEP 4: Add storage quota to users (optional)
 -- ========================================
+-- Note: If this column already exists, you'll get an error - that's fine, just skip this step
 -- Uncomment the line below if you want to add storage quota tracking to users table
 -- ALTER TABLE users ADD COLUMN storage_quota BIGINT DEFAULT 104857600 COMMENT '100MB in bytes';
 
